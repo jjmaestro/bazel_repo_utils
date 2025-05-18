@@ -1,4 +1,4 @@
-# `module_name`
+# `repo_utils`
 
 [![pre-commit](
     ../../actions/workflows/pre-commit.yaml/badge.svg
@@ -7,7 +7,7 @@
     ../../actions/workflows/ci.yaml/badge.svg
 )](../../actions/workflows/ci.yaml)
 
-Bazel module to <DO_SOMETHING>.
+Bazel module to help create and maintain Bazel external repos.
 
 ## 📦 Install
 
@@ -15,7 +15,7 @@ First, make sure you are running Bazel with [Bzlmod]. Then, add the module as a
 dependency in your `MODULE.bazel`:
 
 ```starlark
-bazel_dep(name = "module_name", version = "<VERSION>")
+bazel_dep(name = "repo_utils", version = "<VERSION>")
 ```
 
 <details>
@@ -31,10 +31,10 @@ file, e.g. [`archive_override`]:
 REF = "v<VERSION>"  # NOTE: can be a repo tag or a commit hash
 
 archive_override(
-    module_name = "module_name",
+    module_name = "repo_utils",
     integrity = "",  # TODO: copy the SRI hash that Bazel prints when fetching
-    strip_prefix = "bazel_module_name-%s" % REF.strip("v"),
-    urls = ["https://github.com/<OWNER>/bazel_module_name/archive/%s.tar.gz" % REF],
+    strip_prefix = "bazel_repo_utils-%s" % REF.strip("v"),
+    urls = ["https://github.com/jjmaestro/bazel_repo_utils/archive/%s.tar.gz" % REF],
 )
 ```
 <!-- markdownlint-restore -->
