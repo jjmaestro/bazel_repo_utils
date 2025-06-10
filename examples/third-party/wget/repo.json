@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "sources": {
+    "github.com": {
+      "owner": "mirror",
+      "repo": "wget",
+      "tag": "v{version}",
+      "url": "https://{source}/{owner}/{repo}/archive/refs/tags/{tag}.tar.gz",
+      "strip_prefix": "{repo}-{version}"
+    },
+    "gitlab.com": {
+      "owner": "gnuwget",
+      "repo": "wget",
+      "tag": "v{version}",
+      "filename": "{repo}-{tag}",
+      "url": "https://{source}/{owner}/{repo}/-/archive/{tag}/{filename}.tar.gz",
+      "strip_prefix": "{filename}"
+    }
+  },
+  "versions": {
+    "1.24.5": {
+      "integrity": {
+        "github.com": "sha256-JQ63nHPVVoyJoyIa5ExDcn+BdjKgZdbDMAsgZYWwqy0=",
+        "gitlab.com": "sha256-1Yw1cok0niLv563o07/BrjbCQIflWxK8UFlav9srtcw="
+      }
+    },
+    "1.21.3": {
+        "github.com": "sha256-VbH6fHnent2TtbYxbNoatK4RNkY3MVPXokJhRzPZBg8=",
+        "gitlab.com": "sha256-3w3ImvW4t/H2eMkZbUH+F1zkARSI3cIJSgJFg4ULPU4="
+    }
+  }
+}

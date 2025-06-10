@@ -1,0 +1,3 @@
+load(":wget_src.bzl", wget_src_suite = "examples_suite")
+
+wget_src_suite()

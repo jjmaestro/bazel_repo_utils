@@ -1,0 +1,25 @@
+From 3c1bd306017c6085604365d021dcb4f81ac6854b Mon Sep 17 00:00:00 2001
+From: Javier Maestro <jjmaestro@ieee.org>
+Date: Fri, 11 Jul 2025 13:02:14 +0100
+Subject: [PATCH] test patch
+
+---
+ src/http.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/http.c b/src/http.c
+index 5a5ee84..bd01e17 100644
+--- a/src/http.c
++++ b/src/http.c
+@@ -28,6 +28,8 @@ Corresponding Source for a non-source form of such a combination
+ shall include the source code for the parts of OpenSSL used as well
+ as that of the covered work.  */
+ 
++// Comment to make a test patch
++
+ #include "wget.h"
+ 
+ #include <stdio.h>
+-- 
+2.39.5 (Apple Git-154)
+

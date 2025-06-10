@@ -1,0 +1,42 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "index.bzl",
+    "integrity.bzl",
+    "schema.bzl",
+    "utils.bzl",
+])
+
+bzl_library(
+    name = "utils",
+    srcs = ["utils.bzl"],
+)
+
+bzl_library(
+    name = "integrity",
+    srcs = ["integrity.bzl"],
+    deps = [
+        "@aspect_bazel_lib//lib:base64",
+        "@aspect_bazel_lib//lib:strings",
+    ],
+)
+
+bzl_library(
+    name = "schema",
+    srcs = ["schema.bzl"],
+    deps = [
+        ":integrity",
+    ],
+)
+
+bzl_library(
+    name = "index",
+    srcs = ["index.bzl"],
+    deps = [
+        ":integrity",
+        ":schema",
+        ":utils",
+    ],
+)
