@@ -18,6 +18,9 @@ The index JSON object has the following properties:
   be expanded to a `dict` of `version`s mapped to empty `version` contexts.
 - `sources` (`dict[source, source_context]`): maps `source` names to [URL
   `source` context]s.
+- `metadata` (`dict[any, any]`): free-form "metadata map", useful to add
+  information about the archive that we want to have available in the repo
+  (e.g. requirements, version compatibility, external dependencies, etc).
 
 The index JSON object is parsed, validated and converted to an `index`
 `struct` with the following properties:

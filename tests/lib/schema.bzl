@@ -100,6 +100,12 @@ def _validate_v1__invalid_keys_impl(ctx):
     res = Schema.validate_v1("foo", index_json, _fail = Mock.fail)
     asserts.true(env, "missing mandatory keys" in res)
 
+    # metadata is an optional key
+    index_json = _mock_index()
+    index_json["metadata"] = {}
+
+    asserts.equals(env, None, Schema.validate_v1("foo", index_json, _print = Mock.print([])))
+
     # invalid key
     index_json = _mock_index()
     index_json["foo"] = {}

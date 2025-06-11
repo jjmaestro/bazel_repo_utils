@@ -37,6 +37,7 @@ To construct the arguments passed to [`rctx.download_and_extract`] it uses the
    |-- BUILD.bazel
    |-- index.json
    |-- lock.json
+   |-- metadata.json
    |-- repo.bzl
    `-- patches/
        |-- <VERSION>/
@@ -46,6 +47,7 @@ To construct the arguments passed to [`rctx.download_and_extract`] it uses the
 ```
 
 TL;DR, the repo can be used as follows:
+
 - `@<REPO_NAME>//:<REPO_NAME>`: points to the `:files` target of the
   `DEFAULT_VERSION`.
 - `@<REPO_NAME>//:<TARGET>`: points to the specific `TARGET` of the
@@ -82,12 +84,15 @@ and two constants:
 The root package also has the following:
 - `//:index.json`: a copy of the repo index JSON file.
 - `//:lock.json`: the repo lock file (see below).
+- `//:metadata.json`: the repo metadata.
 - `//:repo.bzl`: extension with the following constants:
   - `REPO_NAME`: The short repo name.
   - `SOURCES`: a mapping of the downloaded `version`s to the `source` from
     which the archive was downloaded.
   - `DEFAULT_VERSION`: the default `version` of the archive.
   - `LOCK`: a `dict` with the contents of the repo `lock.json`.
+  - `METADATA`: the free-form metadata map straight from the repo JSON index,
+    if any.
 - `//patches`: a package with `<VERSION>/<SOURCE>` sub-packages with the
   applied patches applied to that archive, if any (see ["Patching"] below).
 
@@ -382,6 +387,7 @@ REPO = '''\
 REPO_NAME = "{repo_name}"
 VERSIONS = {versions}
 DEFAULT_VERSION = "{default_version}"
+METADATA = {metadata}
 LOCK = {lock}
 '''
 
@@ -414,6 +420,7 @@ exports_files([
     "repo.bzl",
     "index.json",
     "lock.json",
+    "metadata.json",
 ])
 
 bzl_library(
@@ -665,6 +672,7 @@ def _impl(rctx, _print = print, _fail = fail):
             repo_name = repo_name,
             versions = versions,
             default_version = default_version,
+            metadata = index.metadata,
             lock = repo_lock,
         ),
         executable = False,
@@ -678,6 +686,12 @@ def _impl(rctx, _print = print, _fail = fail):
     rctx.file(
         "lock.json",
         json.encode_indent(repo_lock, indent = "  "),
+        executable = False,
+    )
+
+    rctx.file(
+        "metadata.json",
+        json.encode_indent(index.metadata, indent = "  "),
         executable = False,
     )
 

@@ -255,8 +255,8 @@ new__v1_valid_integrity_test = unittest.make(_new__v1_valid_integrity_impl)
 def _new__v1_valid_complex_impl(ctx):
     env = unittest.begin(ctx)
 
-    # Finally, here's a complex index.json with both integrity SRI and sha256
-    # and different types of version contexts:
+    # Finally, here's a complex index.json with both integrity SRI and sha256,
+    # different types of version contexts and metadata:
 
     integrity_sri = "sha256-3q2zP96tsz/erbM/3q2zP96tsz/erbM/3q2zP96tsz8="
     sha256 = "deadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33f"
@@ -282,6 +282,13 @@ def _new__v1_valid_complex_impl(ctx):
         "1.0": {
           "tag": "v1.0"
         }
+      },
+      "metadata": {
+        "versions": {
+          "exclude": {
+            "1.0": "> 1.5.1"
+          }
+        }
       }
     }
     """ % (integrity_sri, sha256)
@@ -291,6 +298,8 @@ def _new__v1_valid_complex_impl(ctx):
     index = Index.new("repo_name", index_json, _print = Mock.print(prints))
     asserts.equals(env, 1, index.version)
     asserts.equals(env, 2, len(index.repos))
+
+    asserts.true(env, "versions" in index.metadata)
 
     asserts.equals(env, 1, len(prints))
     asserts.true(env, "1.0: WARNING: missing integrity/sha256" in prints[0])

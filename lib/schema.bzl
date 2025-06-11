@@ -6,7 +6,7 @@ _INDEX_SCHEMA_KEYS = dict(
     v1 = dict(
         index = dict(
             mandatory = ["version", "sources", "versions"],
-            optional = [],
+            optional = ["metadata"],
         ),
         sources = dict(
             mandatory = ["url"],
@@ -72,7 +72,7 @@ def _validate_keys(repo_name, index, index_version, _fail = fail):
     if _fail != fail and error != None:
         return error
 
-    for section in schema_keys.all_keys:  # version, sources, versions
+    for section in schema_keys.all_keys:  # version, sources, versions, metadata
         schema_keys_s = _get_schema_keys(index_version, section)
 
         if not schema_keys_s.all_keys:
