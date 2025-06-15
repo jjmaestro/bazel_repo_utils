@@ -21,3 +21,13 @@ download_archives(
         "//third-party/wget/patches:0001-1.24.5-test-patch.patch": ">=1.24.5/*",
     },
 )
+
+download_archives(
+    name = "pg_src",
+    index = "//third-party/postgres:repo.json",
+    patches = {
+        "//third-party/postgres/patches:0001-16.0-fix-pgflex.patch": "<17.0",
+    },
+    version_scheme = "pgver",
+    versions = ["16.0"],
+)

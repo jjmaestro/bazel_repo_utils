@@ -12,7 +12,7 @@ to download and extract an archive: the archive's `version`(s) and the
 ## archives
 
 <pre>
-archives(<a href="#archives-name">name</a>, <a href="#archives-index">index</a>, <a href="#archives-patches">patches</a>, <a href="#archives-repo_mapping">repo_mapping</a>, <a href="#archives-sources">sources</a>, <a href="#archives-versions">versions</a>)
+archives(<a href="#archives-name">name</a>, <a href="#archives-index">index</a>, <a href="#archives-patches">patches</a>, <a href="#archives-repo_mapping">repo_mapping</a>, <a href="#archives-sources">sources</a>, <a href="#archives-spec_syntax">spec_syntax</a>, <a href="#archives-version_scheme">version_scheme</a>, <a href="#archives-versions">versions</a>)
 </pre>
 
 This repository rule wraps [`rctx.download_and_extract`] and creates a Bazel
@@ -123,12 +123,13 @@ of `VERSIONS` and `DEFAULT_VERSION`.
 
 ### Version scheme
 
-The version scheme is the format used for versions in both the
-`index` and `patches`. For now, the only version scheme supported is [semantic
-versioning] ([`version_utils`' `SCHEME.SEMVER` `version`]).
+The `version_scheme` attribute defines the format used for versions in both the
+`index` and `patches`. The supported schemes are those in [`version_utils`'
+`version` extension], with `SCHEME.SEMVER` ([semantic versioning]) being the
+default.
 
 [semantic versioning]: https://semver.org
-[`version_utils`' `SCHEME.SEMVER` `version`]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/version/version.md
+[`version_utils`' `version` extension]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/version/version.md
 
 ### Patching
 
@@ -146,7 +147,9 @@ The "patch spec" format is `<VERSION_SPEC>[/<SOURCE>]`, where:
   be `*`, a wildcard to apply the patch to the archives downloaded from any
   source.
 
-The `<VERSION_SPEC>` syntax is [`version_utils`' `SYNTAX.SIMPLE` `spec`].
+The `<VERSION_SPEC>` syntax is specified with the `spec_syntax` attribute. It's
+one of the syntaxes supported by [`version_utils`' `spec` extension] and the
+default is `SYNTAX.SIMPLE`.
 
 This helps to maintain patches that apply to e.g.:
 
@@ -160,7 +163,7 @@ Finally, to simplify patch maintenance, it's good practice to keep a dedicated
 generate the list of patches using [`git format-patch`].
 
 [unified diff format]: https://en.wikipedia.org/wiki/Diff#Unified_format
-[`version_utils`' `SYNTAX.SIMPLE` `spec`]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/specs/spec.md
++[`version_utils` `spec` extension]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/specs/spec.md
 [`git format-patch`]: https://git-scm.com/docs/git-format-patch
 
 ### Usage:
@@ -394,6 +397,8 @@ In this case, the list of targets would look like:
 | <a id="archives-patches"></a>patches |  Diff files to apply as patches at the root of the downloaded archive. The `dict` values represent "patch specs" in the `<VERSION_SPEC>/<SOURCE>` format, and determine when patches apply to the downloaded archive. Patches must be in standard [unified diff format], created from the root of the archive. All patches are applied from the root of the archive with `patch -p1`. For more details, see ["Patching"].   | <a href="https://bazel.build/rules/lib/dict">Dictionary: Label -> String</a> | optional |  `{}`  |
 | <a id="archives-repo_mapping"></a>repo_mapping |  In `WORKSPACE` context only: a dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.<br><br>For example, an entry `"@foo": "@bar"` declares that, for any time this repository depends on `@foo` (such as a dependency on `@foo//some:target`, it should actually resolve that dependency within globally-declared `@bar` (`@bar//some:target`).<br><br>This attribute is _not_ supported in `MODULE.bazel` context (when invoking a repository rule inside a module extension's implementation function).   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  |
 | <a id="archives-sources"></a>sources |  Source names from which to download the archive. If none is specified, it will use all of the sources available in the repo index to try to download and extract the archive.   | List of strings | optional |  `[]`  |
+| <a id="archives-spec_syntax"></a>spec_syntax |  The syntax of the version constraints specification. The available syntaxes are those supported by `version_utils` (see `SYNTAX` in [`version_utils`' `spec` extension](https://github.com/jjmaestro/bazel_version_utils/blob/main/spec/spec.bzl)). Defaults to `SYNTAX.SIMPLE`.   | String | optional |  `"simple"`  |
+| <a id="archives-version_scheme"></a>version_scheme |  The scheme of the versions in `index` and `patches`. The available version schemes are those supported by `version_utils` (see `SCHEME` in [`version_utils`' `version` extension](https://github.com/jjmaestro/bazel_version_utils/blob/main/version/version.bzl)). Defaults to `SCHEME.SEMVER`.   | String | optional |  `"semver"`  |
 | <a id="archives-versions"></a>versions |  Versions of the archive to download. If none is specified it will download all of the versions available in the repo index.   | List of strings | optional |  `[]`  |
 
 

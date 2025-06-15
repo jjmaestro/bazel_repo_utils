@@ -8,6 +8,7 @@ to download and extract an archive: the archive's `version`(s) and the
 """
 
 load("@version_utils//spec:spec.bzl", Spec = "spec")
+load("@version_utils//version:version.bzl", Version = "version")
 load("//lib:index.bzl", Index = "index")
 
 DOC = """
@@ -119,12 +120,13 @@ of `VERSIONS` and `DEFAULT_VERSION`.
 
 ### Version scheme
 
-The version scheme is the format used for versions in both the
-`index` and `patches`. For now, the only version scheme supported is [semantic
-versioning] ([`version_utils`' `SCHEME.SEMVER` `version`]).
+The `version_scheme` attribute defines the format used for versions in both the
+`index` and `patches`. The supported schemes are those in [`version_utils`'
+`version` extension], with `SCHEME.SEMVER` ([semantic versioning]) being the
+default.
 
 [semantic versioning]: https://semver.org
-[`version_utils`' `SCHEME.SEMVER` `version`]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/version/version.md
+[`version_utils`' `version` extension]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/version/version.md
 
 ### Patching
 
@@ -142,7 +144,9 @@ The "patch spec" format is `<VERSION_SPEC>[/<SOURCE>]`, where:
   be `*`, a wildcard to apply the patch to the archives downloaded from any
   source.
 
-The `<VERSION_SPEC>` syntax is [`version_utils`' `SYNTAX.SIMPLE` `spec`].
+The `<VERSION_SPEC>` syntax is specified with the `spec_syntax` attribute. It's
+one of the syntaxes supported by [`version_utils`' `spec` extension] and the
+default is `SYNTAX.SIMPLE`.
 
 This helps to maintain patches that apply to e.g.:
 
@@ -156,7 +160,7 @@ Finally, to simplify patch maintenance, it's good practice to keep a dedicated
 generate the list of patches using [`git format-patch`].
 
 [unified diff format]: https://en.wikipedia.org/wiki/Diff#Unified_format
-[`version_utils`' `SYNTAX.SIMPLE` `spec`]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/specs/spec.md
++[`version_utils` `spec` extension]: https://github.com/jjmaestro/bazel_version_utils/blob/main/docs/specs/spec.md
 [`git format-patch`]: https://git-scm.com/docs/git-format-patch
 
 ### Usage:
@@ -486,13 +490,13 @@ exports_files(glob(
 ))
 '''
 
-def _should_apply_patch(pattern_spec, version, source):
+def _should_apply_patch(pattern_spec, version, source, spec_syntax, version_scheme):
     if "/" in pattern_spec:
         cspec, csource = pattern_spec.split("/", 1)
     else:
         cspec, csource = pattern_spec, "*"
 
-    spec = Spec.new(cspec)
+    spec = Spec.new(cspec, syntax = spec_syntax, version_scheme = version_scheme)
 
     return spec.match(version) and (csource == "*" or csource == source)
 
@@ -647,7 +651,15 @@ def _impl(rctx, _print = print, _fail = fail):
             applied_patches = []
 
             for patch, pattern_spec in rctx.attr.patches.items():
-                if _should_apply_patch(pattern_spec, repo.version, repo.source):
+                should_apply = _should_apply_patch(
+                    pattern_spec,
+                    repo.version,
+                    repo.source,
+                    rctx.attr.spec_syntax,
+                    rctx.attr.version_scheme,
+                )
+
+                if should_apply:
                     _apply_patch(rctx, repo.version, repo.source, patch)
                     applied_patches.append(str(patch))
 
@@ -724,6 +736,26 @@ ATTRS = dict(
         format], created from the root of the archive. All patches are applied
         from the root of the archive with `patch -p1`. For more details, see
         ["Patching"].
+        """,
+    ),
+    spec_syntax = attr.string(
+        default = Spec.SYNTAX.SIMPLE,
+        doc = """
+        The syntax of the version constraints specification. The available
+        syntaxes are those supported by `version_utils` (see `SYNTAX` in
+        [`version_utils`' `spec`
+        extension](https://github.com/jjmaestro/bazel_version_utils/blob/main/spec/spec.bzl)).
+        Defaults to `SYNTAX.SIMPLE`.
+        """,
+    ),
+    version_scheme = attr.string(
+        default = Version.SCHEME.SEMVER,
+        doc = """
+        The scheme of the versions in `index` and `patches`. The available
+        version schemes are those supported by `version_utils` (see `SCHEME` in
+        [`version_utils`' `version`
+        extension](https://github.com/jjmaestro/bazel_version_utils/blob/main/version/version.bzl)).
+        Defaults to `SCHEME.SEMVER`.
         """,
     ),
 )
