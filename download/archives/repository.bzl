@@ -574,7 +574,12 @@ def _apparent_repo_name(rctx):
     # HACK to get the apparent repo name ("short name"). This should be
     # equivalent to native.package_relative_label but that's only available
     # for macros, not rules.
-    return rctx.name.split("~")[-1]
+    apparent_repo_name = rctx.name.split("~")[-1]
+
+    if native.bazel_version and native.bazel_version >= "8.0.0":
+        apparent_repo_name = apparent_repo_name.split("+")[-1]
+
+    return apparent_repo_name
 
 def _impl(rctx, _print = print, _fail = fail):
     repo_name = _apparent_repo_name(rctx)

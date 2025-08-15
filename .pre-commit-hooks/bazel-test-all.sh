@@ -10,6 +10,10 @@ MODULE_NAME="$(
 for module in . docs tests examples e2e e2e/smoke; do
   [[ ! -f "${module}/MODULE.bazel" ]] && continue
 
+  # NOTE:
+  # Skipping docs for Bazel 8 because it adds 'load()' statements.
+  [[ "${module}" == "docs" ]] && bazel --version | grep -q 'bazel 8.' && continue
+
   pushd "${module}" > /dev/null
 
   echo
